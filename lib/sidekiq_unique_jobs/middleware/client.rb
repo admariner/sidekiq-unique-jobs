@@ -7,6 +7,7 @@ module SidekiqUniqueJobs
     # @author Mikael Henriksson <mikael@mhenrixon.com>
     class Client
       prepend SidekiqUniqueJobs::Middleware
+      include SidekiqUniqueJobs::Notifiable
 
       # Calls this client middleware
       #   Used from Sidekiq.process_single
@@ -28,14 +29,8 @@ module SidekiqUniqueJobs
         if (_token = lock_instance.lock)
           yield
         else
-          warn_about_duplicate
+          notify(:duplicate, item)
         end
-      end
-
-      def warn_about_duplicate
-        return unless log_duplicate?
-
-        log_warn "Already locked with another job_id (#{dump_json(item)})"
       end
     end
   end

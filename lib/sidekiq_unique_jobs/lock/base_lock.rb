@@ -8,6 +8,7 @@ module SidekiqUniqueJobs
     # @author Mikael Henriksson <mikael@mhenrixon.com>
     class BaseLock
       include SidekiqUniqueJobs::Logging
+      include SidekiqUniqueJobs::Notifiable
 
       #
       # Validates that the sidekiq_options for the worker is valid

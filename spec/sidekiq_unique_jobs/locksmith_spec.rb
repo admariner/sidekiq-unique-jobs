@@ -223,6 +223,16 @@ RSpec.describe SidekiqUniqueJobs::Locksmith do
         expect(locksmith_two.lock).to be_falsey
       end
 
+      it "notifies on timeout" do
+        allow(locksmith_two).to receive(:notify)
+        locksmith_one.lock
+
+        sleep 0.1
+
+        expect(locksmith_two.lock).to be_falsey
+        expect(locksmith_two).to have_received(:notify).with(:timeout, item_two)
+      end
+
       it "expires the expected keys" do
         locksmith_one.lock
         locksmith_one.unlock

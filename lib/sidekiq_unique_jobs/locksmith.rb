@@ -13,6 +13,10 @@ module SidekiqUniqueJobs
     # @!parse include SidekiqUniqueJobs::Logging
     include SidekiqUniqueJobs::Logging
 
+    # includes "SidekiqUniqueJobs::Notifiable"
+    # @!parse include SidekiqUniqueJobs::Notifiable
+    include SidekiqUniqueJobs::Notifiable
+
     # includes "SidekiqUniqueJobs::Timing"
     # @!parse include SidekiqUniqueJobs::Timing
     include SidekiqUniqueJobs::Timing
@@ -201,7 +205,7 @@ module SidekiqUniqueJobs
                       .future(conn) { |red_con| pop_queued(red_con) }
                       .value(add_drift(config.ttl))
 
-      warn_about_timeout
+      notify(:timeout, item) unless config.wait_for_lock?
     end
 
     #
@@ -239,7 +243,7 @@ module SidekiqUniqueJobs
         return yield popped_jid
       end
 
-      warn_about_timeout
+      notify(:timeout, item) unless config.wait_for_lock?
     end
 
     #
@@ -333,12 +337,6 @@ module SidekiqUniqueJobs
     #
     def taken?(conn)
       conn.hexists(key.locked, job_id)
-    end
-
-    def warn_about_timeout
-      return unless config.wait_for_lock?
-
-      log_debug("Timed out after #{config.timeout}s while waiting for primed token (digest: #{key}, job_id: #{job_id})")
     end
 
     def lock_info

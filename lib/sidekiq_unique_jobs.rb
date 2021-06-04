@@ -15,6 +15,8 @@ require "json"
 require "pathname"
 require "sidekiq"
 
+require "sidekiq_unique_jobs/notification_collection"
+require "sidekiq_unique_jobs/notifiable"
 require "sidekiq_unique_jobs/timer_task"
 require "sidekiq_unique_jobs/version"
 require "sidekiq_unique_jobs/version_check"

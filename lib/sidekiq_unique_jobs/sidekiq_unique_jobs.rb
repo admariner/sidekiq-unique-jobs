@@ -270,4 +270,25 @@ module SidekiqUniqueJobs # rubocop:disable Metrics/ModuleLength
       raise
     end
   end
+
+  #
+  # Collection with notifications
+  #
+  #
+  # @return [NotificationCollection]
+  #
+  def notification_stack
+    @notification_stack ||= NotificationCollection.new
+  end
+
+  #
+  # Yields notification stack for sidekiq unique jobs to configure notifications
+  #
+  #
+  # @return [void] <description>
+  #
+  # @yieldparam [NotificationCollection] x used to configure notifications
+  def subscribe
+    yield notification_stack if block_given?
+  end
 end
